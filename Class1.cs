@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 
@@ -57,9 +58,9 @@ namespace kk_lib_getFromDB
             set { _freetext = value; }
         }
 
-        public DataTable DoSearch()
+        public IEnumerable<DataRow> DoSearch()
         {
-            DataTable dt = MainSearch(_connectionString, _arrangemangTypID, _arrKonstart, _arrAges, _arrTags, _isPublic, _freetext);
+            IEnumerable<DataRow> dt = MainSearch(_connectionString, _arrangemangTypID, _arrKonstart, _arrAges, _arrTags, _isPublic, _freetext);
             return dt;
         }
 
@@ -68,7 +69,7 @@ namespace kk_lib_getFromDB
         //    Console.WriteLine("Class: {0} - Instance: {1}", ClassVariable, InstanceVariable);
         //}
 
-        private static DataTable MainSearch(
+        private static IEnumerable<DataRow> MainSearch(
             string connString,
             int arrangemangTypID,
             int[] arrKonstart,
@@ -80,7 +81,7 @@ namespace kk_lib_getFromDB
         {
             try
             {
-                DataTable returnValue;
+                IEnumerable<DataRow> returnValue;
 
                 SqlConnection sqlConn = new(connString);
 
@@ -142,7 +143,7 @@ namespace kk_lib_getFromDB
 
                 da.Fill(dt);
 
-                returnValue = dt;
+                returnValue = dt.AsEnumerable();
 
                 sqlConn.Close();
 
