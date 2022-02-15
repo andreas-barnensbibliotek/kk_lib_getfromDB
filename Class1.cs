@@ -40,35 +40,35 @@ namespace kk_lib_getFromDB
         public string IsPublic { get; set; }
     }
 
+    public class ClsPublicSearchAutocomplete
+    {
+        public string searchText { get; set; }
+        public int maxResults { get; set; }
+    }
+
     public class ClsQuery
     {
-       
+        const string connString = "Server=localhost;Database=kulturkatalogenDB_SANDBOX;Trusted_Connection=True;";
+
         public static IEnumerable<ClsPublicSearchInfo> DoSearch(ClsPublicSearchCmdInfo clsSearchInput)
         {
-            IEnumerable<ClsPublicSearchInfo> searchResult;
-            //searchResult = MainSearch(_connectionString, _arrangemangTypID, _arrKonstart, _arrAges, _arrTags, _isPublic, _freetext);
-            searchResult = MainSearch(clsSearchInput);
+            IEnumerable<ClsPublicSearchInfo> searchResult = MainSearch(clsSearchInput);
             return searchResult;
         }
 
+        public static IEnumerable<ClsPublicSearchInfo> DoAutoCompleteSearch(ClsPublicSearchAutocomplete clsSearchInput)
+        {
+            IEnumerable<ClsPublicSearchInfo> searchResult = AutoCompleteSearch(clsSearchInput);
+            return searchResult;
+        }
 
         private static IEnumerable<ClsPublicSearchInfo> MainSearch(ClsPublicSearchCmdInfo clsSearchInput)
         {
             //try
             //{
-
-            string connString = "Server=localhost;Database=kulturkatalogenDB_SANDBOX;Trusted_Connection=True;";
-
-
-            List<ClsPublicSearchInfo> lstReturnValue2 = new();
-
             SqlConnection sqlConn = new(connString);
 
             sqlConn.Open();
-
-            //int[] arrKonstart = new int[] { 1, 2 };
-            //int[,] arrAges = new int[,] { { 0, 2 }, { 10, 11 } };
-            //string[] arrTags = new string[] { "foo" };
 
             //Skapa och fyll datatables med de parametrar som kommer in i form av arrayer.
             //------------------------------------------------------------
@@ -119,40 +119,11 @@ namespace kk_lib_getFromDB
 
             SqlDataAdapter da = new(cmdSearch);
             DataTable dt = new();
-
             da.Fill(dt);
-
-            foreach (DataRow row in dt.Rows)
-            {
-                //Skapa ett objekt per rad i svaret, och fyll det med innehållet i varje kolumn
-                ClsPublicSearchInfo qryResult = new();
-
-                qryResult.ArkivStatus = (int?)row["ArkivStatus"];
-                qryResult.ArrangemangstypID = (int?)row["ArrangemangstypID"];
-                qryResult.ArrID = (int)row["ArrID"];
-                qryResult.Datum = (DateTime?)row["Datum"];
-                qryResult.ImageUrl = row["ImageUrl"].ToString();
-                qryResult.Konstform = row["konstform"].ToString();
-                qryResult.Konstform2 = (int?)row["konstform2"];
-                qryResult.Konstform3 = (int?)row["konstform3"];
-                qryResult.Organisation = row["Organisation"].ToString();
-                qryResult.periodslut = (DateTime?)row["periodslut"];
-                qryResult.periodstart = (DateTime?)row["periodstart"];
-                qryResult.Publicerad = row["Publicerad"].ToString();
-                qryResult.Rubrik = row["Rubrik"].ToString();
-                qryResult.Startyear = row["startyear"].ToString();
-                qryResult.Stoppyear = row["stoppyear"].ToString();
-                qryResult.Underrubrik = row["Underrubrik"].ToString();
-                qryResult.UtovarID = (int?)row["UtovarID"];
-
-                lstReturnValue2.Add(qryResult);
-            }
-
-            //returnValue = dt.AsEnumerable();
 
             sqlConn.Close();
 
-            return lstReturnValue2;
+            return FillResultList(dt);
             //}
             //catch(Exception e)
             //{
@@ -161,5 +132,59 @@ namespace kk_lib_getFromDB
             //return null;
         }
 
+        private static IEnumerable<ClsPublicSearchInfo> AutoCompleteSearch(ClsPublicSearchAutocomplete clsSearchInput)
+        {
+            SqlConnection sqlConn = new(connString);
+            sqlConn.Open();
+
+            // Configure the SqlCommand and SqlParameter.  
+            SqlCommand cmdSearch = new("kk_aj_proc_autocomplete1", sqlConn)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+            cmdSearch.Parameters.Add("@searchText", SqlDbType.NVarChar).Value = clsSearchInput.searchText;
+            cmdSearch.Parameters.Add("@maxResults", SqlDbType.Int).Value = clsSearchInput.maxResults;
+
+            SqlDataAdapter da = new(cmdSearch);
+            DataTable dt = new();
+            da.Fill(dt);
+
+            sqlConn.Close();
+
+            return FillResultList(dt);
+        }
+
+        private static List<ClsPublicSearchInfo> FillResultList(DataTable dt)
+        {
+            List<ClsPublicSearchInfo> lstReturnValue = new();
+
+            foreach (DataRow row in dt.Rows)
+            {
+                //Skapa ett objekt per rad i svaret, och fyll det med innehållet i varje kolumn
+                ClsPublicSearchInfo rowObject = new();
+
+                rowObject.ArkivStatus = (int?)row["ArkivStatus"];
+                rowObject.ArrangemangstypID = (int?)row["ArrangemangstypID"];
+                rowObject.ArrID = (int)row["ArrID"];
+                rowObject.Datum = (DateTime?)row["Datum"];
+                rowObject.ImageUrl = row["ImageUrl"].ToString();
+                rowObject.Konstform = row["konstform"].ToString();
+                rowObject.Konstform2 = (int?)row["konstform2"];
+                rowObject.Konstform3 = (int?)row["konstform3"];
+                rowObject.Organisation = row["Organisation"].ToString();
+                rowObject.periodslut = row["periodslut"] == DBNull.Value ? null : (DateTime?)row["periodslut"];
+                rowObject.periodstart = row["periodstart"] == DBNull.Value ? null : (DateTime?)row["periodstart"];
+                rowObject.Publicerad = row["Publicerad"].ToString();
+                rowObject.Rubrik = row["Rubrik"].ToString();
+                rowObject.Startyear = row["startyear"].ToString();
+                rowObject.Stoppyear = row["stoppyear"].ToString();
+                rowObject.Underrubrik = row["Underrubrik"].ToString();
+                rowObject.UtovarID = (int?)row["UtovarID"];
+
+                lstReturnValue.Add(rowObject);
+            }
+
+            return lstReturnValue;
+        }
     }
 }
