@@ -38,24 +38,53 @@ namespace kk_lib_getFromDB
         public int[,] AgeSpans { get; set; }
         public string[] Tags { get; set; }
         public string IsPublic { get; set; }
+        public string ConnectionString { get; set; }
     }
 
     public class ClsPublicSearchAutocomplete
     {
-        public string searchText { get; set; }
-        public int maxResults { get; set; }
+        public string SearchText { get; set; }
+        public int MaxResults { get; set; }
+        public string ConnectionString { get; set; }
     }
 
     public class ClsQuery
     {
-        const string connString = "Server=localhost;Database=kulturkatalogenDB_SANDBOX;Trusted_Connection=True;";
-
-        public static IEnumerable<ClsPublicSearchInfo> DoSearch(ClsPublicSearchCmdInfo clsSearchInput)
+        /// <summary>
+        /// Gör en sökning i databasen
+        /// Exempel: 
+        /// ClsPublicSearchCmdInfo qryParams = new()
+        /// {
+        ///         ArrTypID = 0,
+        ///         CmdTyp = "",
+        ///         KonstartIDs = new int[] { 2, 3 },
+        ///         AgeSpans = new int[,] { { 0, 2 }, { 10, 11 } },
+        ///         Tags = new string[] { "foo","bar" },
+        ///         IsPublic = "ja",
+        ///         FreeTextSearch = "jkgdl" | null,
+        ///         ConnectionString = connString
+        ///    };
+        /// </summary>
+        /// <param name="clsSearchInput">En samling sökparametrar som samlas i en ClsPublicSearchCmdInfo</param>
+        /// <returns>En IEnumerable av objekt av typen ClsPublicSearchInfo</returns>
+        public IEnumerable<ClsPublicSearchInfo> DoSearch(ClsPublicSearchCmdInfo clsSearchInput)
         {
             IEnumerable<ClsPublicSearchInfo> searchResult = MainSearch(clsSearchInput);
             return searchResult;
         }
 
+        /// <summary>
+        /// Gör en snabb sökning i kolumnerna Rubrik och utövare. Matchar om SearchText är en del av innehållet
+        /// Exempel: 
+        /// ClsPublicSearchAutocomplete qryParams = new()
+        /// {
+        ///         SearchText = "kapt",
+        ///         MaxResults = 10,
+        ///         ConnectionString = connString
+        ///    };
+        /// </summary>
+        /// <param name="clsSearchInput">En samling sökparametrar som samlas i en ClsPublicSearchAutocomplete</param>
+        /// <returns>En IEnumerable av objekt av typen ClsPublicSearchInfo</returns>
         public static IEnumerable<ClsPublicSearchInfo> DoAutoCompleteSearch(ClsPublicSearchAutocomplete clsSearchInput)
         {
             IEnumerable<ClsPublicSearchInfo> searchResult = AutoCompleteSearch(clsSearchInput);
@@ -66,7 +95,7 @@ namespace kk_lib_getFromDB
         {
             //try
             //{
-            SqlConnection sqlConn = new(connString);
+            SqlConnection sqlConn = new(clsSearchInput.ConnectionString);
 
             sqlConn.Open();
 
@@ -106,7 +135,7 @@ namespace kk_lib_getFromDB
             //--------------------------------------------------------------
 
             // Configure the SqlCommand and SqlParameter.  
-            SqlCommand cmdSearch = new("kk_aj_proc_Search_TVP", sqlConn)
+            SqlCommand cmdSearch = new("kk_aj_proc_Search", sqlConn)
             {
                 CommandType = CommandType.StoredProcedure
             };
@@ -134,16 +163,16 @@ namespace kk_lib_getFromDB
 
         private static IEnumerable<ClsPublicSearchInfo> AutoCompleteSearch(ClsPublicSearchAutocomplete clsSearchInput)
         {
-            SqlConnection sqlConn = new(connString);
+            SqlConnection sqlConn = new(clsSearchInput.ConnectionString);
             sqlConn.Open();
 
             // Configure the SqlCommand and SqlParameter.  
-            SqlCommand cmdSearch = new("kk_aj_proc_autocomplete1", sqlConn)
+            SqlCommand cmdSearch = new("kk_aj_proc_autocompleteSearch", sqlConn)
             {
                 CommandType = CommandType.StoredProcedure
             };
-            cmdSearch.Parameters.Add("@searchText", SqlDbType.NVarChar).Value = clsSearchInput.searchText;
-            cmdSearch.Parameters.Add("@maxResults", SqlDbType.Int).Value = clsSearchInput.maxResults;
+            cmdSearch.Parameters.Add("@searchText", SqlDbType.NVarChar).Value = clsSearchInput.SearchText;
+            cmdSearch.Parameters.Add("@maxResults", SqlDbType.Int).Value = clsSearchInput.MaxResults;
 
             SqlDataAdapter da = new(cmdSearch);
             DataTable dt = new();
