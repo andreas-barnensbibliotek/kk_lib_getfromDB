@@ -34,9 +34,9 @@ namespace kk_lib_getFromDB
         public int ArrTypID { get; set; }
         public string CmdTyp { get; set; }
         public string FreeTextSearch { get; set; }
-        public int[] KonstartIDs { get; set; }
-        public int[,] AgeSpans { get; set; }
-        public string[] Tags { get; set; }
+        public List<int> KonstartIDs { get; set; }
+        public List<int> AgeSpans { get; set; }
+        public List<string> Tags { get; set; }
         public string IsPublic { get; set; }
         public string ConnectionString { get; set; }
     }
@@ -57,9 +57,9 @@ namespace kk_lib_getFromDB
         /// {
         ///         ArrTypID = 0,
         ///         CmdTyp = "",
-        ///         KonstartIDs = new int[] { 2, 3 },
-        ///         AgeSpans = new int[,] { { 0, 2 }, { 10, 11 } },
-        ///         Tags = new string[] { "foo","bar" },
+        ///         KonstartIDs = new List<int> { 2, 3 },
+        ///         AgeSpans = new List<int> { 2,3 },
+        ///         Tags = new List<string> { "foo","bar" },
         ///         IsPublic = "ja",
         ///         FreeTextSearch = "jkgdl" | null,
         ///         ConnectionString = connString
@@ -112,14 +112,12 @@ namespace kk_lib_getFromDB
             }
 
             DataTable ageDt = new();
-            ageDt.Columns.Add("from");
-            ageDt.Columns.Add("to");
-            for (int i = 0; i < clsSearchInput.AgeSpans.GetLength(0); i++)
+            ageDt.Columns.Add("ageSpanID");
+            foreach (int agespanID in clsSearchInput.AgeSpans)
             {
                 DataRow dr;
                 dr = ageDt.NewRow();
-                dr["from"] = clsSearchInput.AgeSpans[i, 0];
-                dr["to"] = clsSearchInput.AgeSpans[i, 1];
+                dr["ageSpanID"] = agespanID;
                 ageDt.Rows.Add(dr);
             }
 
@@ -135,7 +133,7 @@ namespace kk_lib_getFromDB
             //--------------------------------------------------------------
 
             // Configure the SqlCommand and SqlParameter.  
-            SqlCommand cmdSearch = new("kk_aj_proc_Search", sqlConn)
+            SqlCommand cmdSearch = new("kk_aj_proc_Search_v2", sqlConn)
             {
                 CommandType = CommandType.StoredProcedure
             };
