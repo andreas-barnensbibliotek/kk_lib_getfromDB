@@ -6,48 +6,6 @@ using System.Data.SqlClient;
 namespace kk_lib_getFromDB
 {
 
-    public class ClsPublicSearchInfo
-    {
-        //private int? _ArkivStatus;
-
-        public int? ArkivStatus { get; set; }
-        public int? ArrangemangstypID { get; set; }
-        public int ArrID { get; set; }
-        public DateTime? Datum { get; set; }
-        public string ImageUrl { get; set; }
-        public string Konstform { get; set; }
-        public int? Konstform2 { get; set; }
-        public int? Konstform3 { get; set; }
-        public string Organisation { get; set; }
-        public DateTime? periodslut { get; set; }
-        public DateTime? periodstart { get; set; }
-        public string Publicerad { get; set; }
-        public string Rubrik { get; set; }
-        public string Startyear { get; set; }
-        public string Stoppyear { get; set; }
-        public string Underrubrik { get; set; }
-        public int? UtovarID { get; set; }
-    }
-
-    public class ClsPublicSearchCmdInfo
-    {
-        public int ArrTypID { get; set; }
-        public string CmdTyp { get; set; }
-        public string FreeTextSearch { get; set; }
-        public List<int> KonstartIDs { get; set; }
-        public List<int> AgeSpans { get; set; }
-        public List<string> Tags { get; set; }
-        public string IsPublic { get; set; }
-        public string ConnectionString { get; set; }
-    }
-
-    public class ClsPublicSearchAutocomplete
-    {
-        public string SearchText { get; set; }
-        public int MaxResults { get; set; }
-        public string ConnectionString { get; set; }
-    }
-
     public class ClsQuery
     {
         /// <summary>
