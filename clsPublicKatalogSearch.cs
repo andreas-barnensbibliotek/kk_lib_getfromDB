@@ -108,7 +108,7 @@ namespace kk_lib_getFromDB
 
             sqlConn.Close();
 
-            return FillResultList(dt);
+            return FillResultList(dt, clsSearchInput.ConnectionString);
             //}
             //catch(Exception e)
             //{
@@ -136,10 +136,10 @@ namespace kk_lib_getFromDB
 
             sqlConn.Close();
 
-            return FillResultList(dt);
+            return FillResultList(dt, clsSearchInput.ConnectionString);
         }
 
-        private static List<ClsPublicSearchInfo> FillResultList(DataTable dt)
+        private static List<ClsPublicSearchInfo> FillResultList(DataTable dt, string connectionString)
         {
             List<ClsPublicSearchInfo> lstReturnValue = new();
 
@@ -165,11 +165,132 @@ namespace kk_lib_getFromDB
                 rowObject.Stoppyear = row["stoppyear"].ToString();
                 rowObject.Underrubrik = row["Underrubrik"].ToString();
                 rowObject.UtovarID = (int?)row["UtovarID"];
+                rowObject.ListFaktaInfo = GetFaktaInfo((int)row["ArrID"], connectionString);
+                rowObject.ListUtovareInfo = GetUtovareInfo((int)row["UtovarID"], connectionString);
+                rowObject.ListMediaInfo = GetMediaInfo((int)row["ArrID"], connectionString);
+                rowObject.ListFilterFaktaInfo = new List<filterfaktaInfo>();
 
                 lstReturnValue.Add(rowObject);
             }
 
             return lstReturnValue;
+        }
+
+        private static List<faktainfo> GetFaktaInfo(int arrID, string ConnectionString)
+        {
+            SqlConnection sqlConn = new(ConnectionString);
+            sqlConn.Open();
+
+            List<faktainfo> resultList = new();
+
+            // Configure the SqlCommand and SqlParameter.  
+            SqlCommand cmdSearch = new("kk_aj_proc_getfaktabyarrid", sqlConn)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+            cmdSearch.Parameters.Add("@arrid", SqlDbType.Int).Value = arrID;
+
+            SqlDataAdapter da = new(cmdSearch);
+            DataTable dt = new();
+            da.Fill(dt);
+
+            sqlConn.Close();
+
+            foreach (DataRow row in dt.Rows)
+            {
+                faktainfo fInfo = new();
+                fInfo.Faktaid = (int)row["faktaid"];
+                fInfo.Faktarubrik = row["Faktarubrik"].ToString();
+                fInfo.FaktaTypID = (int)row["faktatypid"];
+                fInfo.FaktaValue = row["faktavalue"].ToString();
+
+                resultList.Add(fInfo);
+            }
+
+            return resultList;
+        }
+
+        private static List<utovareInfo> GetUtovareInfo(int UtovarID, string ConnectionString)
+        {
+            SqlConnection sqlConn = new(ConnectionString);
+            sqlConn.Open();
+
+            List<utovareInfo> resultList = new();
+
+            // Configure the SqlCommand and SqlParameter.  
+            SqlCommand cmdSearch = new("kk_aj_proc_getUtovareById", sqlConn)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+            cmdSearch.Parameters.Add("@UtovarID", SqlDbType.Int).Value = UtovarID;
+
+            SqlDataAdapter da = new(cmdSearch);
+            DataTable dt = new();
+            da.Fill(dt);
+
+            sqlConn.Close();
+
+            foreach (DataRow row in dt.Rows)
+            {
+                utovareInfo uInfo = new();
+                uInfo.UtovarID = (int)row["UtovarID"];
+                uInfo.Organisation = row["Organisation"].ToString();
+                uInfo.Fornamn = row["Fornamn"].ToString();
+                uInfo.Efternamn = row["Efternamn"].ToString();
+                uInfo.Telefon = row["Telefonnummer"].ToString();
+                uInfo.Adress = row["Adress"].ToString();
+                uInfo.Postnr = row["Postnr"].ToString();
+                uInfo.Ort = row["Ort"].ToString();
+                uInfo.Epost= row["Epost"].ToString();
+                uInfo.Kommun= row["Kommun"].ToString();
+                uInfo.Weburl= row["Hemsida"].ToString();
+
+                resultList.Add(uInfo);
+            }
+
+            return resultList;
+        }
+
+        private static List<mediaInfo> GetMediaInfo(int arrID, string ConnectionString)
+        {
+            SqlConnection sqlConn = new(ConnectionString);
+            sqlConn.Open();
+
+            List<mediaInfo> resultList = new();
+
+            // Configure the SqlCommand and SqlParameter.  
+            SqlCommand cmdSearch = new("kk_aj_proc_GetMediaByArrid", sqlConn)
+            {
+                CommandType = CommandType.StoredProcedure
+            };
+            cmdSearch.Parameters.Add("@ArrID", SqlDbType.Int).Value = arrID;
+
+            SqlDataAdapter da = new(cmdSearch);
+            DataTable dt = new();
+            da.Fill(dt);
+
+            sqlConn.Close();
+
+            foreach (DataRow row in dt.Rows)
+            {
+                mediaInfo mInfo = new();
+                mInfo.MediaID = (int)row["mediaID"];
+                mInfo.MediaUrl = row["mediaUrl"].ToString();
+                mInfo.MediaFilename = row["mediaFileName"].ToString();
+                mInfo.MediaSize = row["mediaSize"].ToString();
+                mInfo.MediaAlt = row["mediaAlt"].ToString();
+                mInfo.MediaFoto = row["mediaFoto"].ToString();
+                mInfo.MediaTyp= row["mediatyp"].ToString();
+                mInfo.MediaVald= row["mediaVald"].ToString();
+                mInfo.mediaTitle= row["mediaTitle"].ToString();
+                mInfo.mediaBeskrivning= row["mediaBeskrivning"].ToString();
+                mInfo.mediaLink = row["mediaLink"].ToString();
+                mInfo.sortering = row["sortering"].ToString();
+
+                resultList.Add(mInfo);
+            }
+
+            return resultList;
         }
     }
 }

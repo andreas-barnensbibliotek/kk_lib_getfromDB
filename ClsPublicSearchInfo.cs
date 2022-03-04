@@ -25,5 +25,9 @@ namespace kk_lib_getFromDB
         public string Stoppyear { get; set; }
         public string Underrubrik { get; set; }
         public int? UtovarID { get; set; }
+        public List<faktainfo> ListFaktaInfo { get; set; }
+        public List<utovareInfo> ListUtovareInfo { get; set; }
+        public List<mediaInfo> ListMediaInfo { get; set; }
+        public List<filterfaktaInfo> ListFilterFaktaInfo { get; set; }
     }
 }
