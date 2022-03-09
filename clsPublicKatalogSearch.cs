@@ -108,7 +108,7 @@ namespace kk_lib_getFromDB
 
             sqlConn.Close();
 
-            return FillResultList(dt, clsSearchInput.ConnectionString);
+            return FillResultList(dt, clsSearchInput.ConnectionString, false);
             //}
             //catch(Exception e)
             //{
@@ -136,10 +136,10 @@ namespace kk_lib_getFromDB
 
             sqlConn.Close();
 
-            return FillResultList(dt, clsSearchInput.ConnectionString);
+            return FillResultList(dt, clsSearchInput.ConnectionString, true);
         }
 
-        private static List<ClsPublicSearchInfo> FillResultList(DataTable dt, string connectionString)
+        private static List<ClsPublicSearchInfo> FillResultList(DataTable dt, string connectionString, bool minimumResult)
         {
             List<ClsPublicSearchInfo> lstReturnValue = new();
 
@@ -165,10 +165,20 @@ namespace kk_lib_getFromDB
                 rowObject.Stoppyear = row["stoppyear"].ToString();
                 rowObject.Underrubrik = row["Underrubrik"].ToString();
                 rowObject.UtovarID = (int?)row["UtovarID"];
-                rowObject.ListFaktaInfo = GetFaktaInfo((int)row["ArrID"], connectionString);
-                rowObject.ListUtovareInfo = GetUtovareInfo((int)row["UtovarID"], connectionString);
-                rowObject.ListMediaInfo = GetMediaInfo((int)row["ArrID"], connectionString);
                 rowObject.ListFilterFaktaInfo = new List<filterfaktaInfo>();
+                if (minimumResult)
+                {
+                    rowObject.ListFaktaInfo = new List<faktainfo>();
+                    rowObject.ListUtovareInfo = new List<utovareInfo>();
+                    rowObject.ListMediaInfo = new List<mediaInfo>();
+                }
+                else
+                {
+                    rowObject.ListFaktaInfo = GetFaktaInfo((int)row["ArrID"], connectionString);
+                    rowObject.ListUtovareInfo = GetUtovareInfo((int)row["UtovarID"], connectionString);
+                    rowObject.ListMediaInfo = GetMediaInfo((int)row["ArrID"], connectionString);
+                }
+
 
                 lstReturnValue.Add(rowObject);
             }
@@ -241,9 +251,9 @@ namespace kk_lib_getFromDB
                 uInfo.Adress = row["Adress"].ToString();
                 uInfo.Postnr = row["Postnr"].ToString();
                 uInfo.Ort = row["Ort"].ToString();
-                uInfo.Epost= row["Epost"].ToString();
-                uInfo.Kommun= row["Kommun"].ToString();
-                uInfo.Weburl= row["Hemsida"].ToString();
+                uInfo.Epost = row["Epost"].ToString();
+                uInfo.Kommun = row["Kommun"].ToString();
+                uInfo.Weburl = row["Hemsida"].ToString();
 
                 resultList.Add(uInfo);
             }
@@ -280,10 +290,10 @@ namespace kk_lib_getFromDB
                 mInfo.MediaSize = row["mediaSize"].ToString();
                 mInfo.MediaAlt = row["mediaAlt"].ToString();
                 mInfo.MediaFoto = row["mediaFoto"].ToString();
-                mInfo.MediaTyp= row["mediatyp"].ToString();
-                mInfo.MediaVald= row["mediaVald"].ToString();
-                mInfo.mediaTitle= row["mediaTitle"].ToString();
-                mInfo.mediaBeskrivning= row["mediaBeskrivning"].ToString();
+                mInfo.MediaTyp = row["mediatyp"].ToString();
+                mInfo.MediaVald = row["mediaVald"].ToString();
+                mInfo.mediaTitle = row["mediaTitle"].ToString();
+                mInfo.mediaBeskrivning = row["mediaBeskrivning"].ToString();
                 mInfo.mediaLink = row["mediaLink"].ToString();
                 mInfo.sortering = row["sortering"].ToString();
 
