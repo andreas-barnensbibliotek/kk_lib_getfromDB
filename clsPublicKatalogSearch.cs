@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using Dapper;
 
 namespace kk_lib_getFromDB
 {
@@ -101,6 +102,7 @@ namespace kk_lib_getFromDB
             cmdSearch.Parameters.Add("@pubyesno", SqlDbType.NVarChar, 3).Value = clsSearchInput.IsPublic;
             cmdSearch.Parameters.Add("@tagsTblStrings", SqlDbType.Structured).Value = tagsDt;
             cmdSearch.Parameters.Add("@freetext", SqlDbType.NVarChar, 500).Value = clsSearchInput.FreeTextSearch;
+            cmdSearch.Parameters.Add("@maxResults", SqlDbType.Int).Value = clsSearchInput.maxResults;
 
             SqlDataAdapter da = new(cmdSearch);
             DataTable dt = new();
@@ -163,6 +165,8 @@ namespace kk_lib_getFromDB
                 rowObject.Rubrik = row["Rubrik"].ToString();
                 rowObject.Startyear = row["startyear"].ToString();
                 rowObject.Stoppyear = row["stoppyear"].ToString();
+                rowObject.MinAge = row["minage"].ToString();
+                rowObject.MaxAge = row["maxage"].ToString();
                 rowObject.Underrubrik = row["Underrubrik"].ToString();
                 rowObject.UtovarID = (int?)row["UtovarID"];
                 rowObject.ListFilterFaktaInfo = new List<filterfaktaInfo>();

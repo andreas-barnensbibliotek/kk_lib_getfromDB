@@ -23,6 +23,8 @@ namespace kk_lib_getFromDB
         public string Rubrik { get; set; }
         public string Startyear { get; set; }
         public string Stoppyear { get; set; }
+        public string MinAge { get; set; }
+        public string MaxAge { get; set; }
         public string Underrubrik { get; set; }
         public int? UtovarID { get; set; }
         public List<faktainfo> ListFaktaInfo { get; set; }

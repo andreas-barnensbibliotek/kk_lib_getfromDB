@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "WfqSogU1ZGqtYEy/XXWckVRyNI6IDl7WW1gNVDnqh3P+eI03ZKagwznZTzvGAJXN9NpI7+4Ren1VL6MEtJc4XA==",
+  "dgSpecHash": "c2P80YuWEWiTh6oqzZjV7GXk1Z7Vb7VYjOX9GShHtpCCa6uCNCx4pybMerkrlASsGBoZw10zK9Q5m/qwKyAVSA==",
   "success": true,
   "projectFilePath": "C:\\Visual Studio Projects\\Projects\\kk_lib_getFromDB\\kk_lib_getFromDB.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\chrbo22\\.nuget\\packages\\dapper\\2.0.123\\dapper.2.0.123.nupkg.sha512",
     "C:\\Users\\chrbo22\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.0\\microsoft.netcore.platforms.3.1.0.nupkg.sha512",
     "C:\\Users\\chrbo22\\.nuget\\packages\\microsoft.win32.registry\\4.7.0\\microsoft.win32.registry.4.7.0.nupkg.sha512",
     "C:\\Users\\chrbo22\\.nuget\\packages\\runtime.native.system.data.sqlclient.sni\\4.7.0\\runtime.native.system.data.sqlclient.sni.4.7.0.nupkg.sha512",

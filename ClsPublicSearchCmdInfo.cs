@@ -14,6 +14,7 @@ namespace kk_lib_getFromDB
         public List<int> AgeSpans { get; set; }
         public string IsPublic { get; set; }
         public string ConnectionString { get; set; }
+        public int maxResults { get; set; }
 
         public List<string> Tags
         {
@@ -34,7 +35,8 @@ namespace kk_lib_getFromDB
             {
                 return _KonstartIDs;
             }
-            set {
+            set
+            {
                 value.RemoveAll(x => x == 0);
                 _KonstartIDs = value;
             }
