@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KulturkatalogenDomain.Info;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -6,7 +7,7 @@ using System.Data.SqlClient;
 namespace kk_lib_getFromDB
 {
 
-    public class ClsQuery
+    public class clsPublicKatalogSearch
     {
         /// <summary>
         /// Gör en sökning i databasen
@@ -24,10 +25,10 @@ namespace kk_lib_getFromDB
         ///    };
         /// </summary>
         /// <param name="clsSearchInput">En samling sökparametrar som samlas i en ClsPublicSearchCmdInfo</param>
-        /// <returns>En IEnumerable av objekt av typen ClsPublicSearchInfo</returns>
-        public IEnumerable<ClsPublicSearchInfo> DoSearch(ClsPublicSearchCmdInfo clsSearchInput)
+        /// <returns>En IEnumerable av objekt av typen PublicSearchReturnJsonInfo</returns>
+        public IEnumerable<PublicSearchReturnJsonInfo> DoSearch(ClsPublicSearchCmdInfo clsSearchInput)
         {
-            IEnumerable<ClsPublicSearchInfo> searchResult = MainSearch(clsSearchInput);
+            IEnumerable<PublicSearchReturnJsonInfo> searchResult = MainSearch(clsSearchInput);
             return searchResult;
         }
 
@@ -42,14 +43,14 @@ namespace kk_lib_getFromDB
         ///    };
         /// </summary>
         /// <param name="clsSearchInput">En samling sökparametrar som samlas i en ClsPublicSearchAutocomplete</param>
-        /// <returns>En IEnumerable av objekt av typen ClsPublicSearchInfo</returns>
-        public static IEnumerable<ClsPublicSearchInfo> DoAutoCompleteSearch(ClsPublicSearchAutocomplete clsSearchInput)
+        /// <returns>En IEnumerable av objekt av typen PublicSearchReturnJsonInfo</returns>
+        public static IEnumerable<PublicSearchReturnJsonInfo> DoAutoCompleteSearch(ClsPublicSearchAutocomplete clsSearchInput)
         {
-            IEnumerable<ClsPublicSearchInfo> searchResult = AutoCompleteSearch(clsSearchInput);
+            IEnumerable<PublicSearchReturnJsonInfo> searchResult = AutoCompleteSearch(clsSearchInput);
             return searchResult;
         }
 
-        private static IEnumerable<ClsPublicSearchInfo> MainSearch(ClsPublicSearchCmdInfo clsSearchInput)
+        private static IEnumerable<PublicSearchReturnJsonInfo> MainSearch(ClsPublicSearchCmdInfo clsSearchInput)
         {
             //try
             //{
@@ -117,7 +118,7 @@ namespace kk_lib_getFromDB
             //return null;
         }
 
-        private static IEnumerable<ClsPublicSearchInfo> AutoCompleteSearch(ClsPublicSearchAutocomplete clsSearchInput)
+        private static IEnumerable<PublicSearchReturnJsonInfo> AutoCompleteSearch(ClsPublicSearchAutocomplete clsSearchInput)
         {
             SqlConnection sqlConn = new(clsSearchInput.ConnectionString);
             sqlConn.Open();
@@ -139,36 +140,36 @@ namespace kk_lib_getFromDB
             return FillResultList(dt, clsSearchInput.ConnectionString);
         }
 
-        private static List<ClsPublicSearchInfo> FillResultList(DataTable dt, string connectionString)
+        private static List<PublicSearchReturnJsonInfo> FillResultList(DataTable dt, string connectionString)
         {
-            List<ClsPublicSearchInfo> lstReturnValue = new();
+            List<PublicSearchReturnJsonInfo> lstReturnValue = new();
 
             foreach (DataRow row in dt.Rows)
             {
                 //Skapa ett objekt per rad i svaret, och fyll det med innehållet i varje kolumn
-                ClsPublicSearchInfo rowObject = new();
+                PublicSearchReturnJsonInfo rowObject = new();
 
-                rowObject.ArkivStatus = (int?)row["ArkivStatus"];
-                rowObject.ArrangemangstypID = (int?)row["ArrangemangstypID"];
-                rowObject.ArrID = (int)row["ArrID"];
-                rowObject.Datum = (DateTime?)row["Datum"];
-                rowObject.ImageUrl = row["ImageUrl"].ToString();
-                rowObject.Konstform = row["konstform"].ToString();
-                rowObject.Konstform2 = (int?)row["konstform2"];
-                rowObject.Konstform3 = (int?)row["konstform3"];
-                rowObject.Organisation = row["Organisation"].ToString();
-                rowObject.periodslut = row["periodslut"] == DBNull.Value ? null : (DateTime?)row["periodslut"];
-                rowObject.periodstart = row["periodstart"] == DBNull.Value ? null : (DateTime?)row["periodstart"];
-                rowObject.Publicerad = row["Publicerad"].ToString();
-                rowObject.Rubrik = row["Rubrik"].ToString();
-                rowObject.Startyear = row["startyear"].ToString();
-                rowObject.Stoppyear = row["stoppyear"].ToString();
-                rowObject.Underrubrik = row["Underrubrik"].ToString();
-                rowObject.UtovarID = (int?)row["UtovarID"];
-                rowObject.ListFaktaInfo = GetFaktaInfo((int)row["ArrID"], connectionString);
-                rowObject.ListUtovareInfo = GetUtovareInfo((int)row["UtovarID"], connectionString);
-                rowObject.ListMediaInfo = GetMediaInfo((int)row["ArrID"], connectionString);
-                rowObject.ListFilterFaktaInfo = new List<filterfaktaInfo>();
+                rowObject.ArkivStatus = row["ArkivStatus"].ToString();
+                rowObject.ansokningtypid = row["ArrangemangstypID"].ToString();
+                rowObject.ansokningid = (int)row["ArrID"];
+                rowObject.ansokningdate = row["Datum"].ToString();
+                rowObject.ansokningMediaImage.MediaUrl = row["ImageUrl"].ToString();
+                rowObject.ansokningkonstform = row["konstform"].ToString();
+                rowObject.ansokningKonstform2 = row["konstform2"].ToString();
+                rowObject.ansokningKonstform3 = row["konstform3"].ToString();
+                rowObject.ansokningutovare = row["Organisation"].ToString();
+                rowObject.PeriodSlut = (row["periodslut"] == DBNull.Value ? null : (DateTime?)row["periodslut"]).ToString();
+                rowObject.PeriodStart = (row["periodstart"] == DBNull.Value ? null : (DateTime?)row["periodstart"]).ToString();
+                rowObject.ansokningpublicerad = row["Publicerad"].ToString();
+                rowObject.ansokningtitle = row["Rubrik"].ToString();
+                //rowObject.Startyear = row["startyear"].ToString();
+                //rowObject.Stoppyear = row["stoppyear"].ToString();
+                rowObject.ansokningsubtitle = row["Underrubrik"].ToString();
+                rowObject.ansokningUtovarid = (int)row["UtovarID"];
+                rowObject.ansokningFaktalist = new List<faktainfo>(); // GetFaktaInfo((int)row["ArrID"], connectionString);
+                rowObject.ansokningUtovardata = new utovareInfo(); // GetUtovareInfo((int)row["UtovarID"], connectionString);
+                rowObject.ansokningMedialist = new List<mediaInfo>(); // GetMediaInfo((int)row["ArrID"], connectionString);
+                //rowObject.ListFilterFaktaInfo = new List<filterfaktaInfo>();
 
                 lstReturnValue.Add(rowObject);
             }
@@ -210,12 +211,12 @@ namespace kk_lib_getFromDB
             return resultList;
         }
 
-        private static List<utovareInfo> GetUtovareInfo(int UtovarID, string ConnectionString)
+        private static utovareInfo GetUtovareInfo(int UtovarID, string ConnectionString)
         {
             SqlConnection sqlConn = new(ConnectionString);
             sqlConn.Open();
 
-            List<utovareInfo> resultList = new();
+            //List<utovareInfo> resultList = new();
 
             // Configure the SqlCommand and SqlParameter.  
             SqlCommand cmdSearch = new("kk_aj_proc_getUtovareById", sqlConn)
@@ -230,25 +231,23 @@ namespace kk_lib_getFromDB
 
             sqlConn.Close();
 
-            foreach (DataRow row in dt.Rows)
-            {
+            //foreach (DataRow row in dt.Rows)
+            //{
                 utovareInfo uInfo = new();
-                uInfo.UtovarID = (int)row["UtovarID"];
-                uInfo.Organisation = row["Organisation"].ToString();
-                uInfo.Fornamn = row["Fornamn"].ToString();
-                uInfo.Efternamn = row["Efternamn"].ToString();
-                uInfo.Telefon = row["Telefonnummer"].ToString();
-                uInfo.Adress = row["Adress"].ToString();
-                uInfo.Postnr = row["Postnr"].ToString();
-                uInfo.Ort = row["Ort"].ToString();
-                uInfo.Epost= row["Epost"].ToString();
-                uInfo.Kommun= row["Kommun"].ToString();
-                uInfo.Weburl= row["Hemsida"].ToString();
+                uInfo.UtovarID = (int)dt.Rows[0]["UtovarID"];
+                uInfo.Organisation = dt.Rows[0]["Organisation"].ToString();
+                uInfo.Fornamn = dt.Rows[0]["Fornamn"].ToString();
+                uInfo.Efternamn = dt.Rows[0]["Efternamn"].ToString();
+                uInfo.Telefon = dt.Rows[0]["Telefonnummer"].ToString();
+                uInfo.Adress = dt.Rows[0]["Adress"].ToString();
+                uInfo.Postnr = dt.Rows[0]["Postnr"].ToString();
+                uInfo.Ort = dt.Rows[0]["Ort"].ToString();
+                uInfo.Epost= dt.Rows[0]["Epost"].ToString();
+                uInfo.Kommun= dt.Rows[0]["Kommun"].ToString();
+                uInfo.Weburl= dt.Rows[0]["Hemsida"].ToString();
 
-                resultList.Add(uInfo);
-            }
 
-            return resultList;
+            return uInfo;
         }
 
         private static List<mediaInfo> GetMediaInfo(int arrID, string ConnectionString)

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using KulturkatalogenDomain.Info;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,7 +27,8 @@ namespace kk_lib_getFromDB
         public string Underrubrik { get; set; }
         public int? UtovarID { get; set; }
         public List<faktainfo> ListFaktaInfo { get; set; }
-        public List<utovareInfo> ListUtovareInfo { get; set; }
+        public utovareInfo ListUtovareInfo { get; set; }
+        public mediaInfo Ansokningmediaimage { get; set; }
         public List<mediaInfo> ListMediaInfo { get; set; }
         public List<filterfaktaInfo> ListFilterFaktaInfo { get; set; }
     }
