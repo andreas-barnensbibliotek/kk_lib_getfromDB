@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "VfVZwaz1Czh97F5PCfy78KJjGqiGL2+N1Q77GDVDk2cxkR7GY7LvsGpKWmnrPvVNEgOaZO4c8yI6tB97HkJNGg==",
+  "dgSpecHash": "aQ//5htYhmZ8sLvgvSCbAYkPjpjagyv+4Z+GfwtdkuuXO0AezqcZSfuXY1p/D+bp+D5g/DOredxWSyX/c/aIww==",
   "success": true,
   "projectFilePath": "D:\\devprojekt\\libraries\\kulturkatalogenChristian\\kk_lib_getfromDB\\kk_lib_getFromDB.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\andre\\.nuget\\packages\\dapper\\2.0.123\\dapper.2.0.123.nupkg.sha512",
     "C:\\Users\\andre\\.nuget\\packages\\microsoft.netcore.platforms\\3.1.0\\microsoft.netcore.platforms.3.1.0.nupkg.sha512",
     "C:\\Users\\andre\\.nuget\\packages\\microsoft.win32.registry\\4.7.0\\microsoft.win32.registry.4.7.0.nupkg.sha512",
     "C:\\Users\\andre\\.nuget\\packages\\runtime.native.system.data.sqlclient.sni\\4.7.0\\runtime.native.system.data.sqlclient.sni.4.7.0.nupkg.sha512",
@@ -14,5 +15,12 @@
     "C:\\Users\\andre\\.nuget\\packages\\system.security.accesscontrol\\4.7.0\\system.security.accesscontrol.4.7.0.nupkg.sha512",
     "C:\\Users\\andre\\.nuget\\packages\\system.security.principal.windows\\4.7.0\\system.security.principal.windows.4.7.0.nupkg.sha512"
   ],
-  "logs": []
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Problem reading the cache file D:\\devprojekt\\libraries\\kulturkatalogenChristian\\kk_lib_getfromDB\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
+    }
+  ]
 }
