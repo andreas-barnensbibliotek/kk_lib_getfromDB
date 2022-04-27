@@ -27,9 +27,9 @@ namespace kk_lib_getFromDB
         public string MaxAge { get; set; }
         public string Underrubrik { get; set; }
         public int? UtovarID { get; set; }
-        public List<faktainfo> ListFaktaInfo { get; set; }
-        public List<utovareInfo> ListUtovareInfo { get; set; }
-        public List<mediaInfo> ListMediaInfo { get; set; }
-        public List<filterfaktaInfo> ListFilterFaktaInfo { get; set; }
+        public IEnumerable<faktainfo> ListFaktaInfo { get; set; }
+        public IEnumerable<utovareInfo> ListUtovareInfo { get; set; }
+        public IEnumerable<mediaInfo> ListMediaInfo { get; set; }
+        public IEnumerable<filterfaktaInfo> ListFilterFaktaInfo { get; set; }
     }
 }

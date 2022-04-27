@@ -54,91 +54,54 @@ namespace kk_lib_getFromDB
         {
             //try
             //{
-            SqlConnection sqlConn = new(clsSearchInput.ConnectionString);
-
-            sqlConn.Open();
-
             //Skapa och fyll datatables med de parametrar som kommer in i form av arrayer.
             //------------------------------------------------------------
             DataTable konstartDt = new();
-            konstartDt.Columns.Add("konstart");
+            konstartDt.Columns.Add("konstart", typeof(int));
             foreach (int konstart in clsSearchInput.KonstartIDs)
             {
-                DataRow dr;
-                dr = konstartDt.NewRow();
-                dr["konstart"] = konstart;
-                konstartDt.Rows.Add(dr);
+                konstartDt.Rows.Add(konstart);
             }
 
             DataTable ageDt = new();
-            ageDt.Columns.Add("ageSpanID");
+            ageDt.Columns.Add("ageSpanID", typeof(int));
             foreach (int agespanID in clsSearchInput.AgeSpans)
             {
-                DataRow dr;
-                dr = ageDt.NewRow();
-                dr["ageSpanID"] = agespanID;
-                ageDt.Rows.Add(dr);
+                ageDt.Rows.Add(agespanID);
             }
 
             DataTable tagsDt = new();
-            tagsDt.Columns.Add("tag");
+            tagsDt.Columns.Add("tag", typeof(string));
             foreach (string tag in clsSearchInput.Tags)
             {
-                DataRow dr;
-                dr = tagsDt.NewRow();
-                dr["tag"] = tag;
-                tagsDt.Rows.Add(dr);
+                tagsDt.Rows.Add(tag);
             }
             //--------------------------------------------------------------
 
-            // Configure the SqlCommand and SqlParameter.  
-            SqlCommand cmdSearch = new("kk_aj_proc_Search_v2", sqlConn)
+            string procedure = "kk_aj_proc_Search_v2";
+            using IDbConnection db = new SqlConnection(clsSearchInput.ConnectionString);
+            db.Open();
+            var @params = new
             {
-                CommandType = CommandType.StoredProcedure
+                arrtypid = clsSearchInput.ArrTypID,
+                konstartTblIDs = konstartDt,
+                ageLimitsTblInts = ageDt,
+                pubyesno = clsSearchInput.IsPublic,
+                tagsTblStrings = tagsDt,
+                freetext = clsSearchInput.FreeTextSearch,
+                maxResults = clsSearchInput.maxResults
             };
-            cmdSearch.Parameters.Add("@arrtypid", SqlDbType.Int).Value = clsSearchInput.ArrTypID;
-            cmdSearch.Parameters.Add("@konstartTblIDs", SqlDbType.Structured).Value = konstartDt;
-            cmdSearch.Parameters.Add("@ageLimitsTblInts", SqlDbType.Structured).Value = ageDt;
-            cmdSearch.Parameters.Add("@pubyesno", SqlDbType.NVarChar, 3).Value = clsSearchInput.IsPublic;
-            cmdSearch.Parameters.Add("@tagsTblStrings", SqlDbType.Structured).Value = tagsDt;
-            cmdSearch.Parameters.Add("@freetext", SqlDbType.NVarChar, 500).Value = clsSearchInput.FreeTextSearch;
-            cmdSearch.Parameters.Add("@maxResults", SqlDbType.Int).Value = clsSearchInput.maxResults;
+            IEnumerable<ClsPublicSearchInfo> returnValue = db.Query<ClsPublicSearchInfo>(procedure, @params, commandType: CommandType.StoredProcedure);
 
-            SqlDataAdapter da = new(cmdSearch);
-            DataTable dt = new();
-            da.Fill(dt);
-
-            sqlConn.Close();
-
-            return FillResultList(dt, clsSearchInput.ConnectionString, false);
-            //}
-            //catch(Exception e)
-            //{
-            //    Console.WriteLine(e.Message);
-            //}
-            //return null;
-        }
-
-        private static IEnumerable<ClsPublicSearchInfo> AutoCompleteSearch(ClsPublicSearchAutocomplete clsSearchInput)
-        {
-            SqlConnection sqlConn = new(clsSearchInput.ConnectionString);
-            sqlConn.Open();
-
-            // Configure the SqlCommand and SqlParameter.  
-            SqlCommand cmdSearch = new("kk_aj_proc_autocompleteSearch", sqlConn)
+            //Lägg till listor med utövare, fakta och media
+            foreach (ClsPublicSearchInfo responseRecord in returnValue)
             {
-                CommandType = CommandType.StoredProcedure
-            };
-            cmdSearch.Parameters.Add("@searchText", SqlDbType.NVarChar).Value = clsSearchInput.SearchText;
-            cmdSearch.Parameters.Add("@maxResults", SqlDbType.Int).Value = clsSearchInput.MaxResults;
+                responseRecord.ListUtovareInfo = GetUtovareInfo((int)responseRecord.UtovarID, clsSearchInput.ConnectionString);
+                responseRecord.ListFaktaInfo = GetFaktaInfo((int)responseRecord.ArrID, clsSearchInput.ConnectionString);
+                responseRecord.ListMediaInfo = GetMediaInfo((int)responseRecord.ArrID, clsSearchInput.ConnectionString);
+            }
 
-            SqlDataAdapter da = new(cmdSearch);
-            DataTable dt = new();
-            da.Fill(dt);
-
-            sqlConn.Close();
-
-            return FillResultList(dt, clsSearchInput.ConnectionString, true);
+            return returnValue;
         }
 
         private static List<ClsPublicSearchInfo> FillResultList(DataTable dt, string connectionString, bool minimumResult)
@@ -190,121 +153,48 @@ namespace kk_lib_getFromDB
             return lstReturnValue;
         }
 
-        private static List<faktainfo> GetFaktaInfo(int arrID, string ConnectionString)
+        private static IEnumerable<ClsPublicSearchInfo> AutoCompleteSearch(ClsPublicSearchAutocomplete clsSearchInput)
         {
-            SqlConnection sqlConn = new(ConnectionString);
-            sqlConn.Open();
+            string procedure = "kk_aj_proc_autocompleteSearch";
+            using IDbConnection db = new SqlConnection(clsSearchInput.ConnectionString);
+            db.Open();
+            var @params = new { searchText = clsSearchInput.SearchText, maxResults = clsSearchInput.MaxResults };
+            IEnumerable<ClsPublicSearchInfo> returnValue = db.Query<ClsPublicSearchInfo>(procedure, @params, commandType: CommandType.StoredProcedure);
 
-            List<faktainfo> resultList = new();
-
-            // Configure the SqlCommand and SqlParameter.  
-            SqlCommand cmdSearch = new("kk_aj_proc_getfaktabyarrid", sqlConn)
-            {
-                CommandType = CommandType.StoredProcedure
-            };
-            cmdSearch.Parameters.Add("@arrid", SqlDbType.Int).Value = arrID;
-
-            SqlDataAdapter da = new(cmdSearch);
-            DataTable dt = new();
-            da.Fill(dt);
-
-            sqlConn.Close();
-
-            foreach (DataRow row in dt.Rows)
-            {
-                faktainfo fInfo = new();
-                fInfo.Faktaid = (int)row["faktaid"];
-                fInfo.Faktarubrik = row["Faktarubrik"].ToString();
-                fInfo.FaktaTypID = (int)row["faktatypid"];
-                fInfo.FaktaValue = row["faktavalue"].ToString();
-
-                resultList.Add(fInfo);
-            }
-
-            return resultList;
+            return returnValue;
         }
 
-        private static List<utovareInfo> GetUtovareInfo(int UtovarID, string ConnectionString)
+        private static IEnumerable<faktainfo> GetFaktaInfo(int arrID, string ConnectionString)
         {
-            SqlConnection sqlConn = new(ConnectionString);
-            sqlConn.Open();
+            string procedure = "kk_aj_proc_getfaktabyarrid";
+            using IDbConnection db = new SqlConnection(ConnectionString);
+            db.Open();
+            var @params = new { ArrID = arrID };
+            IEnumerable<faktainfo> returnValue = db.Query<faktainfo>(procedure, @params, commandType: CommandType.StoredProcedure);
 
-            List<utovareInfo> resultList = new();
-
-            // Configure the SqlCommand and SqlParameter.  
-            SqlCommand cmdSearch = new("kk_aj_proc_getUtovareById", sqlConn)
-            {
-                CommandType = CommandType.StoredProcedure
-            };
-            cmdSearch.Parameters.Add("@UtovarID", SqlDbType.Int).Value = UtovarID;
-
-            SqlDataAdapter da = new(cmdSearch);
-            DataTable dt = new();
-            da.Fill(dt);
-
-            sqlConn.Close();
-
-            foreach (DataRow row in dt.Rows)
-            {
-                utovareInfo uInfo = new();
-                uInfo.UtovarID = (int)row["UtovarID"];
-                uInfo.Organisation = row["Organisation"].ToString();
-                uInfo.Fornamn = row["Fornamn"].ToString();
-                uInfo.Efternamn = row["Efternamn"].ToString();
-                uInfo.Telefon = row["Telefonnummer"].ToString();
-                uInfo.Adress = row["Adress"].ToString();
-                uInfo.Postnr = row["Postnr"].ToString();
-                uInfo.Ort = row["Ort"].ToString();
-                uInfo.Epost = row["Epost"].ToString();
-                uInfo.Kommun = row["Kommun"].ToString();
-                uInfo.Weburl = row["Hemsida"].ToString();
-
-                resultList.Add(uInfo);
-            }
-
-            return resultList;
+            return returnValue;
         }
 
-        private static List<mediaInfo> GetMediaInfo(int arrID, string ConnectionString)
+        private static IEnumerable<utovareInfo> GetUtovareInfo(int UtovarID, string ConnectionString)
         {
-            SqlConnection sqlConn = new(ConnectionString);
-            sqlConn.Open();
+            string procedure = "kk_aj_proc_getUtovareById";
+            using IDbConnection db = new SqlConnection(ConnectionString);
+            db.Open();
+            var @params = new { UtovarID = UtovarID };
+            IEnumerable<utovareInfo> returnValue = db.Query<utovareInfo>(procedure, @params, commandType: CommandType.StoredProcedure);
 
-            List<mediaInfo> resultList = new();
+            return returnValue;
+        }
 
-            // Configure the SqlCommand and SqlParameter.  
-            SqlCommand cmdSearch = new("kk_aj_proc_GetMediaByArrid", sqlConn)
-            {
-                CommandType = CommandType.StoredProcedure
-            };
-            cmdSearch.Parameters.Add("@ArrID", SqlDbType.Int).Value = arrID;
+        private static IEnumerable<mediaInfo> GetMediaInfo(int arrID, string ConnectionString)
+        {
+            string procedure = "kk_aj_proc_GetMediaByArrid";
+            using IDbConnection db = new SqlConnection(ConnectionString);
+            db.Open();
+            var @params = new { ArrID = arrID };
+            IEnumerable<mediaInfo> returnValue = db.Query<mediaInfo>(procedure, @params, commandType: CommandType.StoredProcedure);
 
-            SqlDataAdapter da = new(cmdSearch);
-            DataTable dt = new();
-            da.Fill(dt);
-
-            sqlConn.Close();
-
-            foreach (DataRow row in dt.Rows)
-            {
-                mediaInfo mInfo = new();
-                mInfo.MediaID = (int)row["mediaID"];
-                mInfo.MediaUrl = row["mediaUrl"].ToString();
-                mInfo.MediaFilename = row["mediaFileName"].ToString();
-                mInfo.MediaSize = row["mediaSize"].ToString();
-                mInfo.MediaAlt = row["mediaAlt"].ToString();
-                mInfo.MediaFoto = row["mediaFoto"].ToString();
-                mInfo.MediaTyp = row["mediatyp"].ToString();
-                mInfo.MediaVald = row["mediaVald"].ToString();
-                mInfo.mediaTitle = row["mediaTitle"].ToString();
-                mInfo.mediaBeskrivning = row["mediaBeskrivning"].ToString();
-                mInfo.mediaLink = row["mediaLink"].ToString();
-                mInfo.sortering = row["sortering"].ToString();
-
-                resultList.Add(mInfo);
-            }
-
-            return resultList;
+            return returnValue;
         }
     }
 }

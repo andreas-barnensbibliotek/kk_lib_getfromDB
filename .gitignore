@@ -4,6 +4,8 @@
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
 dapperTest.cs
+toSICTest.cs
+ToSIC2.cs
 
 # User-specific files
 *.rsuser
