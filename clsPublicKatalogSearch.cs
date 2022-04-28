@@ -26,10 +26,10 @@ namespace kk_lib_getFromDB
         ///    };
         /// </summary>
         /// <param name="clsSearchInput">En samling sökparametrar som samlas i en ClsPublicSearchCmdInfo</param>
-        /// <returns>En IEnumerable av objekt av typen PublicSearchReturnJsonInfo</returns>
-        public IEnumerable<PublicSearchReturnJsonInfo> DoSearch(ClsPublicSearchCmdInfo clsSearchInput)
+        /// <returns>En IEnumerable av objekt av typen ClsPublicSearchInfo</returns>
+        public IEnumerable<ClsPublicSearchInfo> DoSearch(ClsPublicSearchCmdInfo clsSearchInput)
         {
-            IEnumerable<PublicSearchReturnJsonInfo> searchResult = MainSearch(clsSearchInput);
+            IEnumerable<ClsPublicSearchInfo> searchResult = MainSearch(clsSearchInput);
             return searchResult;
         }
 
@@ -44,14 +44,14 @@ namespace kk_lib_getFromDB
         ///    };
         /// </summary>
         /// <param name="clsSearchInput">En samling sökparametrar som samlas i en ClsPublicSearchAutocomplete</param>
-        /// <returns>En IEnumerable av objekt av typen PublicSearchReturnJsonInfo</returns>
-        public static IEnumerable<PublicSearchReturnJsonInfo> DoAutoCompleteSearch(ClsPublicSearchAutocomplete clsSearchInput)
+        /// <returns>En IEnumerable av objekt av typen ClsPublicSearchInfo</returns>
+        public static IEnumerable<ClsPublicSearchInfo> DoAutoCompleteSearch(ClsPublicSearchAutocomplete clsSearchInput)
         {
-            IEnumerable<PublicSearchReturnJsonInfo> searchResult = AutoCompleteSearch(clsSearchInput);
+            IEnumerable<ClsPublicSearchInfo> searchResult = AutoCompleteSearch(clsSearchInput);
             return searchResult;
         }
 
-        private static IEnumerable<PublicSearchReturnJsonInfo> MainSearch(ClsPublicSearchCmdInfo clsSearchInput)
+        private static IEnumerable<ClsPublicSearchInfo> MainSearch(ClsPublicSearchCmdInfo clsSearchInput)
         {
             //try
             //{
@@ -107,7 +107,7 @@ namespace kk_lib_getFromDB
 
         private static List<ClsPublicSearchInfo> FillResultList(DataTable dt, string connectionString, bool minimumResult)
         {
-            List<PublicSearchReturnJsonInfo> lstReturnValue = new();
+            List<ClsPublicSearchInfo> lstReturnValue = new();
 
             foreach (DataRow row in dt.Rows)
             {
