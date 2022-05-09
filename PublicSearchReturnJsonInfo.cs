@@ -4,7 +4,7 @@ namespace kk_lib_getFromDB
 {
     public class PublicSearchReturnJsonInfo
     {
-       
+
         private int _ansokningid;
         private string _ansokningdate;
         private string _ansokningcontentid;
@@ -39,6 +39,8 @@ namespace kk_lib_getFromDB
         private mediaInfo _ansokningmediaimage;
         private utovareInfo _utovardata;
         private string _agesspan;
+        private int _startyear;
+        private int _stoppyear;
         private filterfaktaInfo _filterfakta;
         public PublicSearchReturnJsonInfo()
         {
@@ -58,7 +60,7 @@ namespace kk_lib_getFromDB
             _ansokningurl = "";
             _ansokningbilaga = "";
             _ansokningmediaimage = new mediaInfo();
-            _ansokusername = "";            
+            _ansokusername = "";
             _utovareid = 0;
             _utovardata = new utovareInfo();
             _konstform2 = "0";
@@ -131,7 +133,6 @@ namespace kk_lib_getFromDB
             }
         }
 
-        
         public string ansokningContent
         {
             get
@@ -155,7 +156,6 @@ namespace kk_lib_getFromDB
             }
         }
 
-        
         public string ansokningurl
         {
             get
@@ -168,7 +168,6 @@ namespace kk_lib_getFromDB
             }
         }
 
-        
         public string ansokningbilaga
         {
             get
@@ -263,8 +262,9 @@ namespace kk_lib_getFromDB
                 _ansokningkonstform = value;
             }
         }
-        
-        public List<mediaInfo> ansokningmovieclip {
+
+        public List<mediaInfo> ansokningmovieclip
+        {
             get
             {
                 return _ansokningmovieclip;
@@ -274,7 +274,7 @@ namespace kk_lib_getFromDB
                 _ansokningmovieclip = value;
             }
         }
-        
+
         public List<faktainfo> ansokningFaktalist
         {
             get
@@ -298,7 +298,7 @@ namespace kk_lib_getFromDB
                 _medialist = value;
             }
         }
-            
+
         public string ansokningUsername
         {
             get
@@ -310,7 +310,7 @@ namespace kk_lib_getFromDB
                 _ansokusername = value;
             }
         }
-        
+
         public mediaInfo ansokningMediaImage
         {
             get
@@ -335,7 +335,7 @@ namespace kk_lib_getFromDB
             }
         }
 
-        
+
         public utovareInfo ansokningUtovardata
         {
             get
@@ -360,7 +360,32 @@ namespace kk_lib_getFromDB
             }
         }
 
-        
+        public int ansokningStartyear
+        {
+            get
+            {
+                return _startyear;
+            }
+            set
+            {
+                _startyear = value;
+                _agesspan = value + "-" + _stoppyear;
+            }
+        }
+
+        public int ansokningStoppyear
+        {
+            get
+            {
+                return _stoppyear;
+            }
+            set
+            {
+                _stoppyear = value;
+                _agesspan = _startyear + "-" + value;
+            }
+        }
+
         public filterfaktaInfo ansokningFilterfakta
         {
             get
