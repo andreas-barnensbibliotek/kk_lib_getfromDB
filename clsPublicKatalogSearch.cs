@@ -27,9 +27,9 @@ namespace kk_lib_getFromDB
         /// </summary>
         /// <param name="clsSearchInput">En samling sökparametrar som samlas i en ClsPublicSearchCmdInfo</param>
         /// <returns>En IEnumerable av objekt av typen ClsPublicSearchInfo</returns>
-        public IEnumerable<ClsPublicSearchInfo> DoSearch(ClsPublicSearchCmdInfo clsSearchInput)
+        public IEnumerable<PublicSearchReturnJsonInfo> DoSearch(ClsPublicSearchCmdInfo clsSearchInput, bool getExtendedResults=false)
         {
-            IEnumerable<ClsPublicSearchInfo> searchResult = MainSearch(clsSearchInput);
+            IEnumerable<PublicSearchReturnJsonInfo> searchResult = MainSearch(clsSearchInput, getExtendedResults);
             return searchResult;
         }
 
@@ -45,13 +45,13 @@ namespace kk_lib_getFromDB
         /// </summary>
         /// <param name="clsSearchInput">En samling sökparametrar som samlas i en ClsPublicSearchAutocomplete</param>
         /// <returns>En IEnumerable av objekt av typen ClsPublicSearchInfo</returns>
-        public static IEnumerable<ClsPublicSearchInfo> DoAutoCompleteSearch(ClsPublicSearchAutocomplete clsSearchInput)
+        public static IEnumerable<PublicSearchReturnJsonInfo> DoAutoCompleteSearch(ClsPublicSearchAutocomplete clsSearchInput)
         {
-            IEnumerable<ClsPublicSearchInfo> searchResult = AutoCompleteSearch(clsSearchInput);
+            IEnumerable<PublicSearchReturnJsonInfo> searchResult = AutoCompleteSearch(clsSearchInput);
             return searchResult;
         }
 
-        private static IEnumerable<ClsPublicSearchInfo> MainSearch(ClsPublicSearchCmdInfo clsSearchInput)
+        private static IEnumerable<PublicSearchReturnJsonInfo> MainSearch(ClsPublicSearchCmdInfo clsSearchInput, bool getExtendedResults)
         {
             //try
             //{
@@ -79,7 +79,7 @@ namespace kk_lib_getFromDB
             }
             //--------------------------------------------------------------
 
-            string procedure = "kk_aj_proc_Search_v2";
+            string procedure = "kk_aj_proc_Search_v3";
             using IDbConnection db = new SqlConnection(clsSearchInput.ConnectionString);
             db.Open();
             var @params = new
@@ -92,20 +92,44 @@ namespace kk_lib_getFromDB
                 freetext = clsSearchInput.FreeTextSearch,
                 maxResults = clsSearchInput.maxResults
             };
-            IEnumerable<ClsPublicSearchInfo> returnValue = db.Query<ClsPublicSearchInfo>(procedure, @params, commandType: CommandType.StoredProcedure);
+            IEnumerable<PublicSearchReturnJsonInfo> returnValue = db.Query<PublicSearchReturnJsonInfo>(procedure, @params, commandType: CommandType.StoredProcedure);
 
             //Lägg till listor med utövare, fakta och media
-            foreach (ClsPublicSearchInfo responseRecord in returnValue)
+            if (getExtendedResults)
             {
-                responseRecord.ListUtovareInfo = GetUtovareInfo((int)responseRecord.UtovarID, clsSearchInput.ConnectionString);
-                responseRecord.ListFaktaInfo = GetFaktaInfo((int)responseRecord.ArrID, clsSearchInput.ConnectionString);
-                responseRecord.ListMediaInfo = GetMediaInfo((int)responseRecord.ArrID, clsSearchInput.ConnectionString);
+                foreach (PublicSearchReturnJsonInfo responseRecord in returnValue)
+                {
+                    responseRecord.ansokningUtovardata = GetUtovareInfo((int)responseRecord.ansokningUtovarid, clsSearchInput.ConnectionString);
+                    responseRecord.ansokningFaktalist = GetFaktaInfo((int)responseRecord.ansokningid, clsSearchInput.ConnectionString);
+                    responseRecord.ansokningMedialist = GetMediaInfo((int)responseRecord.ansokningid, clsSearchInput.ConnectionString);
+                }
+            } else
+            {
+                foreach (PublicSearchReturnJsonInfo responseRecord in returnValue)
+                {
+                    responseRecord.ansokningUtovardata = new();
+                    responseRecord.ansokningFaktalist = new List<faktainfo>();
+                    responseRecord.ansokningMedialist = new List<mediaInfo>();
+                }
             }
+
+
+
+            return returnValue;
+        }
+   
+        private static IEnumerable<PublicSearchReturnJsonInfo> AutoCompleteSearch(ClsPublicSearchAutocomplete clsSearchInput)
+        {
+            string procedure = "kk_aj_proc_autocompleteSearch_v2";
+            using IDbConnection db = new SqlConnection(clsSearchInput.ConnectionString);
+            db.Open();
+            var @params = new { searchText = clsSearchInput.SearchText, maxResults = clsSearchInput.MaxResults };
+            IEnumerable<PublicSearchReturnJsonInfo> returnValue = db.Query<PublicSearchReturnJsonInfo>(procedure, @params, commandType: CommandType.StoredProcedure);
 
             return returnValue;
         }
 
-        private static List<ClsPublicSearchInfo> FillResultList(DataTable dt, string connectionString, bool minimumResult)
+        private static List<ClsPublicSearchInfo> FillResultList__OLD(DataTable dt, string connectionString, bool minimumResult)
         {
             List<ClsPublicSearchInfo> lstReturnValue = new();
 
@@ -143,10 +167,9 @@ namespace kk_lib_getFromDB
                 else
                 {
                     rowObject.ListFaktaInfo = GetFaktaInfo((int)row["ArrID"], connectionString);
-                    rowObject.ListUtovareInfo = GetUtovareInfo((int)row["UtovarID"], connectionString);
+                    //rowObject.ListUtovareInfo = GetUtovareInfo((int)row["UtovarID"], connectionString);
                     rowObject.ListMediaInfo = GetMediaInfo((int)row["ArrID"], connectionString);
                 }
-
 
                 lstReturnValue.Add(rowObject);
             }
@@ -154,46 +177,38 @@ namespace kk_lib_getFromDB
             return lstReturnValue;
         }
 
-        private static IEnumerable<ClsPublicSearchInfo> AutoCompleteSearch(ClsPublicSearchAutocomplete clsSearchInput)
-        {
-            string procedure = "kk_aj_proc_autocompleteSearch";
-            using IDbConnection db = new SqlConnection(clsSearchInput.ConnectionString);
-            db.Open();
-            var @params = new { searchText = clsSearchInput.SearchText, maxResults = clsSearchInput.MaxResults };
-            IEnumerable<ClsPublicSearchInfo> returnValue = db.Query<ClsPublicSearchInfo>(procedure, @params, commandType: CommandType.StoredProcedure);
 
-            return returnValue;
-        }
-
-        private static IEnumerable<faktainfo> GetFaktaInfo(int arrID, string ConnectionString)
+        private static List<faktainfo> GetFaktaInfo(int arrID, string ConnectionString)
         {
             string procedure = "kk_aj_proc_getfaktabyarrid";
             using IDbConnection db = new SqlConnection(ConnectionString);
             db.Open();
             var @params = new { ArrID = arrID };
-            IEnumerable<faktainfo> returnValue = db.Query<faktainfo>(procedure, @params, commandType: CommandType.StoredProcedure);
+            var results = db.Query<faktainfo>(procedure, @params, commandType: CommandType.StoredProcedure);
+            List<faktainfo> returnValue = new List<faktainfo>(results);
 
             return returnValue;
         }
 
-        private static IEnumerable<utovareInfo> GetUtovareInfo(int UtovarID, string ConnectionString)
+        private static utovareInfo GetUtovareInfo(int UtovarID, string ConnectionString)
         {
             string procedure = "kk_aj_proc_getUtovareById";
             using IDbConnection db = new SqlConnection(ConnectionString);
             db.Open();
             var @params = new { UtovarID = UtovarID };
-            IEnumerable<utovareInfo> returnValue = db.Query<utovareInfo>(procedure, @params, commandType: CommandType.StoredProcedure);
+            utovareInfo returnValue = db.QuerySingle<utovareInfo>(procedure, @params, commandType: CommandType.StoredProcedure);
 
             return returnValue;
         }
 
-        private static IEnumerable<mediaInfo> GetMediaInfo(int arrID, string ConnectionString)
+        private static List<mediaInfo> GetMediaInfo(int arrID, string ConnectionString)
         {
             string procedure = "kk_aj_proc_GetMediaByArrid";
             using IDbConnection db = new SqlConnection(ConnectionString);
             db.Open();
             var @params = new { ArrID = arrID };
-            IEnumerable<mediaInfo> returnValue = db.Query<mediaInfo>(procedure, @params, commandType: CommandType.StoredProcedure);
+            var results = db.Query<mediaInfo>(procedure, @params, commandType: CommandType.StoredProcedure);
+            List<mediaInfo> returnValue = new List<mediaInfo>(results);
 
             return returnValue;
         }
