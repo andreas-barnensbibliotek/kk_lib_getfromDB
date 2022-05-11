@@ -6,6 +6,7 @@
 dapperTest.cs
 toSICTest.cs
 ToSIC2.cs
+ClsSearchHandler.cs
 
 # User-specific files
 *.rsuser

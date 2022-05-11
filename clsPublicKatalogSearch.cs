@@ -26,7 +26,7 @@ namespace kk_lib_getFromDB
         /// </summary>
         /// <param name="clsSearchInput">En samling sökparametrar som samlas i en ClsPublicSearchCmdInfo</param>
         /// <returns>En IEnumerable av objekt av typen ClsPublicSearchInfo</returns>
-        public IEnumerable<PublicSearchReturnJsonInfo> DoSearch(ClsPublicSearchCmdInfo clsSearchInput, bool getExtendedResults=false)
+        public IEnumerable<PublicSearchReturnJsonInfo> DoSearch(ClsPublicSearchCmdInfo clsSearchInput, bool getExtendedResults = false)
         {
             IEnumerable<PublicSearchReturnJsonInfo> searchResult = MainSearch(clsSearchInput, getExtendedResults);
             return searchResult;
@@ -102,7 +102,8 @@ namespace kk_lib_getFromDB
                     responseRecord.ansokningFaktalist = GetFaktaInfo((int)responseRecord.ansokningid, clsSearchInput.ConnectionString);
                     responseRecord.ansokningMedialist = GetMediaInfo((int)responseRecord.ansokningid, clsSearchInput.ConnectionString);
                 }
-            } else
+            }
+            else
             {
                 foreach (PublicSearchReturnJsonInfo responseRecord in returnValue)
                 {
@@ -112,11 +113,9 @@ namespace kk_lib_getFromDB
                 }
             }
 
-
-
             return returnValue;
         }
-   
+
         private static IEnumerable<PublicSearchReturnJsonInfo> AutoCompleteSearch(ClsPublicSearchAutocomplete clsSearchInput)
         {
             string procedure = "kk_aj_proc_autocompleteSearch_v2";
