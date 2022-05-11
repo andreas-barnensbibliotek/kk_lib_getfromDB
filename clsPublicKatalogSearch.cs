@@ -95,23 +95,36 @@ namespace kk_lib_getFromDB
             IEnumerable<PublicSearchReturnJsonInfo> returnValue = db.Query<PublicSearchReturnJsonInfo>(procedure, @params, commandType: CommandType.StoredProcedure);
 
             //Lägg till listor med utövare, fakta och media
-            if (getExtendedResults)
-            {
+            //if (getExtendedResults)
+            //{
                 foreach (PublicSearchReturnJsonInfo responseRecord in returnValue)
                 {
-                    responseRecord.ansokningUtovardata = GetUtovareInfo((int)responseRecord.ansokningUtovarid, clsSearchInput.ConnectionString);
-                    responseRecord.ansokningFaktalist = GetFaktaInfo((int)responseRecord.ansokningid, clsSearchInput.ConnectionString);
-                    responseRecord.ansokningMedialist = GetMediaInfo((int)responseRecord.ansokningid, clsSearchInput.ConnectionString);
+                    responseRecord.ansokningMediaImage = new mediaInfo();
+                    responseRecord.ansokningMediaImage.MediaUrl = responseRecord.ImageUrl;
+
+                    if (getExtendedResults)
+                    {
+                        responseRecord.ansokningUtovardata = GetUtovareInfo((int)responseRecord.ansokningUtovarid, clsSearchInput.ConnectionString);
+                        responseRecord.ansokningFaktalist = GetFaktaInfo((int)responseRecord.ansokningid, clsSearchInput.ConnectionString);
+                        responseRecord.ansokningMedialist = GetMediaInfo((int)responseRecord.ansokningid, clsSearchInput.ConnectionString);
+                    }
+                    else
+                    {
+                        responseRecord.ansokningUtovardata = new();
+                        responseRecord.ansokningFaktalist = new List<faktainfo>();
+                        responseRecord.ansokningMedialist = new();
+                    }                 
+                    
                 }
-            } else
-            {
-                foreach (PublicSearchReturnJsonInfo responseRecord in returnValue)
-                {
-                    responseRecord.ansokningUtovardata = new();
-                    responseRecord.ansokningFaktalist = new List<faktainfo>();
-                    responseRecord.ansokningMedialist = new List<mediaInfo>();
-                }
-            }
+            //} else
+            //{
+            //    foreach (PublicSearchReturnJsonInfo responseRecord in returnValue)
+            //    {
+            //        responseRecord.ansokningUtovardata = new();
+            //        responseRecord.ansokningFaktalist = new List<faktainfo>();
+            //        responseRecord.ansokningMedialist = new List<mediaInfo>();
+            //    }
+            //}
 
 
 
@@ -142,7 +155,7 @@ namespace kk_lib_getFromDB
                 rowObject.ArrangemangstypID = (int?)row["ArrangemangstypID"];
                 rowObject.ArrID = (int)row["ArrID"];
                 rowObject.Datum = (DateTime?)row["Datum"];
-                rowObject.ImageUrl = row["ImageUrl"].ToString();
+                rowObject.ImageUrl = row["MediaU"].ToString();               
                 rowObject.Konstform = row["konstform"].ToString();
                 rowObject.Konstform2 = (int?)row["konstform2"];
                 rowObject.Konstform3 = (int?)row["konstform3"];
