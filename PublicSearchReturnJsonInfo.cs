@@ -42,6 +42,8 @@ namespace kk_lib_getFromDB
         private int _startyear;
         private int _stoppyear;
         private filterfaktaInfo _filterfakta;
+        private string _ImageUrl;
+
         public PublicSearchReturnJsonInfo()
         {
             _ansokningid = 0;
@@ -74,6 +76,7 @@ namespace kk_lib_getFromDB
             _periodSlut = "";
             _arkivstatus = "0";
         }
+        
         public int ansokningid
         {
             get
@@ -85,7 +88,6 @@ namespace kk_lib_getFromDB
                 _ansokningid = value;
             }
         }
-
         public string ansokningdate
         {
             get
@@ -511,6 +513,18 @@ namespace kk_lib_getFromDB
             set
             {
                 _arkivstatus = value;
+            }
+        }
+
+        public string ImageUrl
+        {
+            get
+            {
+                return _ImageUrl;
+            }
+            set
+            {
+                _ImageUrl = value;
             }
         }
     }

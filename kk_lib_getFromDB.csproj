@@ -5,20 +5,16 @@
     <StartupObject />
   </PropertyGroup>
 
-  <ItemGroup>
+  <!--<ItemGroup>
     <Compile Remove="faktainfo.cs" />
     <Compile Remove="mediaInfo.cs" />
     <Compile Remove="PublicSearchReturnJsonInfo.cs" />
     <Compile Remove="utovareInfo.cs" />
-  </ItemGroup>
+  </ItemGroup>-->
 
   <ItemGroup>
     <PackageReference Include="Dapper" Version="2.0.123" />
     <PackageReference Include="System.Data.SqlClient" Version="4.8.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\kulturkatalogenCore\KulturkatalogenDomain\KulturkatalogenDomain.csproj" />
   </ItemGroup>
 
 </Project>

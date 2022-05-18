@@ -15,6 +15,7 @@ namespace kk_lib_getFromDB
         public string IsPublic { get; set; }
         public string ConnectionString { get; set; }
         public int maxResults { get; set; }
+        public int UtovareID { get; set; }
 
         public List<string> Tags
         {

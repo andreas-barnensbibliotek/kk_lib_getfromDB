@@ -11,26 +11,38 @@ namespace kk_lib_getFromDB
     public class clsPublicKatalogSearch
     {
         /// <summary>
-        /// Gör en sökning i databasen
+        /// Gör en sökning i databasen. Om clsSearchInput.UtovareID = 0, så körs en vanlig sökning. Annars hämtas alla arr av utövaren med medskickat ID.
         /// Exempel: 
-        /// ClsPublicSearchCmdInfo qryParams = new()
-        /// {
-        ///         ArrTypID = 0,
-        ///         CmdTyp = "",
-        ///         KonstartIDs = new List<int> { 2, 3 },
-        ///         AgeSpans = new List<int> { 2,3 },
-        ///         Tags = new List<string> { "foo","bar" },
-        ///         IsPublic = "ja",
-        ///         FreeTextSearch = "jkgdl" | null,
-        ///         ConnectionString = connString
-        ///    };
+        /// ClsPublicSearchCmdInfo searchobj = new ClsPublicSearchCmdInfo();Adde
+        /// searchobj.ArrTypID = 0;
+        /// searchobj.FreeTextSearch = "";
+        /// searchobj.CmdTyp = "";
+        /// searchobj.AgeSpans = new List<int> { };
+        /// searchobj.KonstartIDs = new List<int> { 2 };
+        /// searchobj.ConnectionString = connString;
+        /// searchobj.Tags = new List<string> { "" };
+        /// searchobj.maxResults = 10;
+        /// searchobj.IsPublic = null;
+        /// //searchobj.UtovareID = 1014;
+        /// clsPublicKatalogSearch query = new();
+        /// IEnumerable<PublicSearchReturnJsonInfo> ieQueryResult = query.DoSearch(searchobj);
         /// </summary>
         /// <param name="clsSearchInput">En samling sökparametrar som samlas i en ClsPublicSearchCmdInfo</param>
-        /// <returns>En IEnumerable av objekt av typen ClsPublicSearchInfo</returns>
+        /// <param name="getExtendedResults">Om true, så hämtas även utökad data om utövare, fakta och media</param>
+        /// <returns>En IEnumerable av objekt av typen PublicSearchReturnJsonInfo</returns>
         public IEnumerable<PublicSearchReturnJsonInfo> DoSearch(ClsPublicSearchCmdInfo clsSearchInput, bool getExtendedResults = false)
         {
-            IEnumerable<PublicSearchReturnJsonInfo> searchResult = MainSearch(clsSearchInput, getExtendedResults);
-            return searchResult;
+            if (clsSearchInput.UtovareID == 0)
+            {
+                IEnumerable<PublicSearchReturnJsonInfo> searchResult = MainSearch(clsSearchInput, getExtendedResults);
+                return searchResult;
+            }
+            else
+            {
+                IEnumerable<PublicSearchReturnJsonInfo> searchResult = UtovareSearch(clsSearchInput);
+                return searchResult;
+            }
+
         }
 
         /// <summary>
@@ -97,25 +109,25 @@ namespace kk_lib_getFromDB
             //Lägg till listor med utövare, fakta och media
             //if (getExtendedResults)
             //{
-                foreach (PublicSearchReturnJsonInfo responseRecord in returnValue)
-                {
-                    responseRecord.ansokningMediaImage = new mediaInfo();
-                    responseRecord.ansokningMediaImage.MediaUrl = responseRecord.ImageUrl;
+            foreach (PublicSearchReturnJsonInfo responseRecord in returnValue)
+            {
+                responseRecord.ansokningMediaImage = new mediaInfo();
+                responseRecord.ansokningMediaImage.MediaUrl = responseRecord.ImageUrl;
 
-                    if (getExtendedResults)
-                    {
-                        responseRecord.ansokningUtovardata = GetUtovareInfo((int)responseRecord.ansokningUtovarid, clsSearchInput.ConnectionString);
-                        responseRecord.ansokningFaktalist = GetFaktaInfo((int)responseRecord.ansokningid, clsSearchInput.ConnectionString);
-                        responseRecord.ansokningMedialist = GetMediaInfo((int)responseRecord.ansokningid, clsSearchInput.ConnectionString);
-                    }
-                    else
-                    {
-                        responseRecord.ansokningUtovardata = new();
-                        responseRecord.ansokningFaktalist = new List<faktainfo>();
-                        responseRecord.ansokningMedialist = new();
-                    }                 
-                    
+                if (getExtendedResults)
+                {
+                    responseRecord.ansokningUtovardata = GetUtovareInfo((int)responseRecord.ansokningUtovarid, clsSearchInput.ConnectionString);
+                    responseRecord.ansokningFaktalist = GetFaktaInfo((int)responseRecord.ansokningid, clsSearchInput.ConnectionString);
+                    responseRecord.ansokningMedialist = GetMediaInfo((int)responseRecord.ansokningid, clsSearchInput.ConnectionString);
                 }
+                else
+                {
+                    responseRecord.ansokningUtovardata = new();
+                    responseRecord.ansokningFaktalist = new List<faktainfo>();
+                    responseRecord.ansokningMedialist = new();
+                }
+
+            }
             //} else
             //{
             //    foreach (PublicSearchReturnJsonInfo responseRecord in returnValue)
@@ -140,6 +152,20 @@ namespace kk_lib_getFromDB
             return returnValue;
         }
 
+        private static IEnumerable<PublicSearchReturnJsonInfo> UtovareSearch(ClsPublicSearchCmdInfo clsSearchInput)
+        {
+            string procedure = "kk_aj_proc_GetArrBy_Utovare_v2";
+            using IDbConnection db = new SqlConnection(clsSearchInput.ConnectionString);
+            db.Open();
+            var @params = new
+            {
+                utovarid = clsSearchInput.UtovareID
+            };
+            IEnumerable<PublicSearchReturnJsonInfo> returnValue = db.Query<PublicSearchReturnJsonInfo>(procedure, @params, commandType: CommandType.StoredProcedure);
+
+            return returnValue;
+        }
+
         private static List<ClsPublicSearchInfo> FillResultList__OLD(DataTable dt, string connectionString, bool minimumResult)
         {
             List<ClsPublicSearchInfo> lstReturnValue = new();
@@ -153,7 +179,7 @@ namespace kk_lib_getFromDB
                 rowObject.ArrangemangstypID = (int?)row["ArrangemangstypID"];
                 rowObject.ArrID = (int)row["ArrID"];
                 rowObject.Datum = (DateTime?)row["Datum"];
-                rowObject.ImageUrl = row["MediaU"].ToString();               
+                rowObject.ImageUrl = row["MediaU"].ToString();
                 rowObject.Konstform = row["konstform"].ToString();
                 rowObject.Konstform2 = (int?)row["konstform2"];
                 rowObject.Konstform3 = (int?)row["konstform3"];

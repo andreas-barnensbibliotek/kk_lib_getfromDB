@@ -1,23 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "D:\\devprojekt\\libraries\\kulturkatalogenChristian\\kk_lib_getfromDB\\kk_lib_getFromDB.csproj": {}
+    "C:\\Visual Studio Projects\\Projects\\kk_lib_getFromDB\\kk_lib_getFromDB.csproj": {}
   },
   "projects": {
-    "D:\\devprojekt\\libraries\\kulturkatalogenChristian\\kk_lib_getfromDB\\kk_lib_getFromDB.csproj": {
+    "C:\\Visual Studio Projects\\Projects\\kk_lib_getFromDB\\kk_lib_getFromDB.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\devprojekt\\libraries\\kulturkatalogenChristian\\kk_lib_getfromDB\\kk_lib_getFromDB.csproj",
+        "projectUniqueName": "C:\\Visual Studio Projects\\Projects\\kk_lib_getFromDB\\kk_lib_getFromDB.csproj",
         "projectName": "kk_lib_getFromDB",
-        "projectPath": "D:\\devprojekt\\libraries\\kulturkatalogenChristian\\kk_lib_getfromDB\\kk_lib_getFromDB.csproj",
-        "packagesPath": "C:\\Users\\andre\\.nuget\\packages\\",
-        "outputPath": "D:\\devprojekt\\libraries\\kulturkatalogenChristian\\kk_lib_getfromDB\\obj\\",
+        "projectPath": "C:\\Visual Studio Projects\\Projects\\kk_lib_getFromDB\\kk_lib_getFromDB.csproj",
+        "packagesPath": "C:\\Users\\chrbo22\\.nuget\\packages\\",
+        "outputPath": "C:\\Visual Studio Projects\\Projects\\kk_lib_getFromDB\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\andre\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\chrbo22\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -30,11 +27,7 @@
         "frameworks": {
           "net5.0": {
             "targetAlias": "net5.0",
-            "projectReferences": {
-              "D:\\devprojekt\\libraries\\kulturkatalogenCore\\KulturkatalogenDomain\\KulturkatalogenDomain.csproj": {
-                "projectPath": "D:\\devprojekt\\libraries\\kulturkatalogenCore\\KulturkatalogenDomain\\KulturkatalogenDomain.csproj"
-              }
-            }
+            "projectReferences": {}
           }
         },
         "warningProperties": {
@@ -71,64 +64,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.104\\RuntimeIdentifierGraph.json"
-        }
-      }
-    },
-    "D:\\devprojekt\\libraries\\kulturkatalogenCore\\KulturkatalogenDomain\\KulturkatalogenDomain.csproj": {
-      "version": "1.0.0",
-      "restore": {
-        "projectUniqueName": "D:\\devprojekt\\libraries\\kulturkatalogenCore\\KulturkatalogenDomain\\KulturkatalogenDomain.csproj",
-        "projectName": "KulturkatalogenDomain",
-        "projectPath": "D:\\devprojekt\\libraries\\kulturkatalogenCore\\KulturkatalogenDomain\\KulturkatalogenDomain.csproj",
-        "packagesPath": "C:\\Users\\andre\\.nuget\\packages\\",
-        "outputPath": "D:\\devprojekt\\libraries\\kulturkatalogenCore\\KulturkatalogenDomain\\obj\\",
-        "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
-        "configFilePaths": [
-          "C:\\Users\\andre\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
-        ],
-        "originalTargetFrameworks": [
-          "net5.0"
-        ],
-        "sources": {
-          "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-          "https://api.nuget.org/v3/index.json": {}
-        },
-        "frameworks": {
-          "net5.0": {
-            "targetAlias": "net5.0",
-            "projectReferences": {}
-          }
-        },
-        "warningProperties": {
-          "warnAsError": [
-            "NU1605"
-          ]
-        }
-      },
-      "frameworks": {
-        "net5.0": {
-          "targetAlias": "net5.0",
-          "imports": [
-            "net461",
-            "net462",
-            "net47",
-            "net471",
-            "net472",
-            "net48"
-          ],
-          "assetTargetFallback": true,
-          "warn": true,
-          "frameworkReferences": {
-            "Microsoft.NETCore.App": {
-              "privateAssets": "all"
-            }
-          },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.104\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.407\\RuntimeIdentifierGraph.json"
         }
       }
     }
