@@ -139,6 +139,16 @@
             "rid": "win"
           }
         }
+      },
+      "KulturkatalogenDomain/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v5.0",
+        "compile": {
+          "bin/placeholder/KulturkatalogenDomain.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/KulturkatalogenDomain.dll": {}
+        }
       }
     }
   },
@@ -246,7 +256,6 @@
       "path": "runtime.win-arm64.runtime.native.system.data.sqlclient.sni/4.4.0",
       "files": [
         ".nupkg.metadata",
-        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "runtime.win-arm64.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
@@ -262,7 +271,6 @@
       "path": "runtime.win-x64.runtime.native.system.data.sqlclient.sni/4.4.0",
       "files": [
         ".nupkg.metadata",
-        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "runtime.win-x64.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
@@ -278,7 +286,6 @@
       "path": "runtime.win-x86.runtime.native.system.data.sqlclient.sni/4.4.0",
       "files": [
         ".nupkg.metadata",
-        ".signature.p7s",
         "ThirdPartyNotices.txt",
         "dotnet_library_license.txt",
         "runtime.win-x86.runtime.native.system.data.sqlclient.sni.4.4.0.nupkg.sha512",
@@ -473,28 +480,38 @@
         "useSharedDesignerContext.txt",
         "version.txt"
       ]
+    },
+    "KulturkatalogenDomain/1.0.0": {
+      "type": "project",
+      "path": "../../kulturkatalogenCore/KulturkatalogenDomain/KulturkatalogenDomain.csproj",
+      "msbuildProject": "../../kulturkatalogenCore/KulturkatalogenDomain/KulturkatalogenDomain.csproj"
     }
   },
   "projectFileDependencyGroups": {
     "net5.0": [
       "Dapper >= 2.0.123",
+      "KulturkatalogenDomain >= 1.0.0",
       "System.Data.SqlClient >= 4.8.3"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\chrbo22\\.nuget\\packages\\": {}
+    "C:\\Users\\andre\\.nuget\\packages\\": {},
+    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Visual Studio Projects\\Projects\\kk_lib_getFromDB\\kk_lib_getFromDB.csproj",
+      "projectUniqueName": "D:\\devprojekt\\libraries\\kulturkatalogenChristian\\kk_lib_getfromDB\\kk_lib_getFromDB.csproj",
       "projectName": "kk_lib_getFromDB",
-      "projectPath": "C:\\Visual Studio Projects\\Projects\\kk_lib_getFromDB\\kk_lib_getFromDB.csproj",
-      "packagesPath": "C:\\Users\\chrbo22\\.nuget\\packages\\",
-      "outputPath": "C:\\Visual Studio Projects\\Projects\\kk_lib_getFromDB\\obj\\",
+      "projectPath": "D:\\devprojekt\\libraries\\kulturkatalogenChristian\\kk_lib_getfromDB\\kk_lib_getFromDB.csproj",
+      "packagesPath": "C:\\Users\\andre\\.nuget\\packages\\",
+      "outputPath": "D:\\devprojekt\\libraries\\kulturkatalogenChristian\\kk_lib_getfromDB\\obj\\",
       "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+      ],
       "configFilePaths": [
-        "C:\\Users\\chrbo22\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\andre\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -507,7 +524,11 @@
       "frameworks": {
         "net5.0": {
           "targetAlias": "net5.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "D:\\devprojekt\\libraries\\kulturkatalogenCore\\KulturkatalogenDomain\\KulturkatalogenDomain.csproj": {
+              "projectPath": "D:\\devprojekt\\libraries\\kulturkatalogenCore\\KulturkatalogenDomain\\KulturkatalogenDomain.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
@@ -544,8 +565,16 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.407\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.104\\RuntimeIdentifierGraph.json"
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "Undefined",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "Problem reading the cache file D:\\devprojekt\\libraries\\kulturkatalogenChristian\\kk_lib_getfromDB\\obj\\project.nuget.cache : Invalid property identifier character: <. Path 'version', line 3, position 0."
+    }
+  ]
 }
