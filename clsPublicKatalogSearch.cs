@@ -32,17 +32,8 @@ namespace kk_lib_getFromDB
         /// <returns>En IEnumerable av objekt av typen PublicSearchReturnJsonInfo</returns>
         public IEnumerable<PublicSearchReturnJsonInfo> DoSearch(ClsPublicSearchCmdInfo clsSearchInput, bool getExtendedResults = false)
         {
-            if (clsSearchInput.UtovareID == 0)
-            {
-                IEnumerable<PublicSearchReturnJsonInfo> searchResult = MainSearch(clsSearchInput, getExtendedResults);
-                return searchResult;
-            }
-            else
-            {
-                IEnumerable<PublicSearchReturnJsonInfo> searchResult = UtovareSearch(clsSearchInput);
-                return searchResult;
-            }
-
+            IEnumerable<PublicSearchReturnJsonInfo> searchResult = MainSearch(clsSearchInput, getExtendedResults);
+            return searchResult;
         }
 
         /// <summary>
@@ -102,7 +93,8 @@ namespace kk_lib_getFromDB
                 pubyesno = clsSearchInput.IsPublic,
                 tagsTblStrings = tagsDt,
                 freetext = clsSearchInput.FreeTextSearch,
-                maxResults = clsSearchInput.maxResults
+                maxResults = clsSearchInput.maxResults,
+                utovareID = clsSearchInput.UtovareID
             };
             IEnumerable<PublicSearchReturnJsonInfo> returnValue = db.Query<PublicSearchReturnJsonInfo>(procedure, @params, commandType: CommandType.StoredProcedure);
 
@@ -152,16 +144,38 @@ namespace kk_lib_getFromDB
             return returnValue;
         }
 
-        private static IEnumerable<PublicSearchReturnJsonInfo> UtovareSearch(ClsPublicSearchCmdInfo clsSearchInput)
+
+        private static List<faktainfo> GetFaktaInfo(int arrID, string ConnectionString)
         {
-            string procedure = "kk_aj_proc_GetArrBy_Utovare_v2";
-            using IDbConnection db = new SqlConnection(clsSearchInput.ConnectionString);
+            string procedure = "kk_aj_proc_getfaktabyarrid";
+            using IDbConnection db = new SqlConnection(ConnectionString);
             db.Open();
-            var @params = new
-            {
-                utovarid = clsSearchInput.UtovareID
-            };
-            IEnumerable<PublicSearchReturnJsonInfo> returnValue = db.Query<PublicSearchReturnJsonInfo>(procedure, @params, commandType: CommandType.StoredProcedure);
+            var @params = new { ArrID = arrID };
+            var results = db.Query<faktainfo>(procedure, @params, commandType: CommandType.StoredProcedure);
+            List<faktainfo> returnValue = new List<faktainfo>(results);
+
+            return returnValue;
+        }
+
+        private static utovareInfo GetUtovareInfo(int UtovarID, string ConnectionString)
+        {
+            string procedure = "kk_aj_proc_getUtovareById";
+            using IDbConnection db = new SqlConnection(ConnectionString);
+            db.Open();
+            var @params = new { UtovarID = UtovarID };
+            utovareInfo returnValue = db.QuerySingle<utovareInfo>(procedure, @params, commandType: CommandType.StoredProcedure);
+
+            return returnValue;
+        }
+
+        private static List<mediaInfo> GetMediaInfo(int arrID, string ConnectionString)
+        {
+            string procedure = "kk_aj_proc_GetMediaByArrid";
+            using IDbConnection db = new SqlConnection(ConnectionString);
+            db.Open();
+            var @params = new { ArrID = arrID };
+            var results = db.Query<mediaInfo>(procedure, @params, commandType: CommandType.StoredProcedure);
+            List<mediaInfo> returnValue = new List<mediaInfo>(results);
 
             return returnValue;
         }
@@ -214,40 +228,5 @@ namespace kk_lib_getFromDB
             return lstReturnValue;
         }
 
-
-        private static List<faktainfo> GetFaktaInfo(int arrID, string ConnectionString)
-        {
-            string procedure = "kk_aj_proc_getfaktabyarrid";
-            using IDbConnection db = new SqlConnection(ConnectionString);
-            db.Open();
-            var @params = new { ArrID = arrID };
-            var results = db.Query<faktainfo>(procedure, @params, commandType: CommandType.StoredProcedure);
-            List<faktainfo> returnValue = new List<faktainfo>(results);
-
-            return returnValue;
-        }
-
-        private static utovareInfo GetUtovareInfo(int UtovarID, string ConnectionString)
-        {
-            string procedure = "kk_aj_proc_getUtovareById";
-            using IDbConnection db = new SqlConnection(ConnectionString);
-            db.Open();
-            var @params = new { UtovarID = UtovarID };
-            utovareInfo returnValue = db.QuerySingle<utovareInfo>(procedure, @params, commandType: CommandType.StoredProcedure);
-
-            return returnValue;
-        }
-
-        private static List<mediaInfo> GetMediaInfo(int arrID, string ConnectionString)
-        {
-            string procedure = "kk_aj_proc_GetMediaByArrid";
-            using IDbConnection db = new SqlConnection(ConnectionString);
-            db.Open();
-            var @params = new { ArrID = arrID };
-            var results = db.Query<mediaInfo>(procedure, @params, commandType: CommandType.StoredProcedure);
-            List<mediaInfo> returnValue = new List<mediaInfo>(results);
-
-            return returnValue;
-        }
     }
 }
